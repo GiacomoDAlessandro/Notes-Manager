@@ -18,22 +18,41 @@ import javafx.geometry.Insets;
 import javafx.scene.layout.StackPane;
 
 import java.awt.*;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
 
 import static javafx.application.Application.launch;
 
+/**
+ *
+ */
 public class NotesGUI extends  Application {
 
+  /**
+   *
+   */
   private Stage primaryWindow;
 
+  /**
+   *
+   */
   private Scene homeScreen;
 
+  /**
+   *
+   */
   private Scene createAccount;
 
+  /**
+   *
+   */
   private Scene signIn;
 
   private final Font timesNewRoman = new Font("Times New Roman", 18);
 
   private final Font Title = new Font("Times New Roman", 24);
+
+  private HashMap<String, String> users;
 
   public void setUpWindow() {
     setUpHome();
@@ -45,7 +64,7 @@ public class NotesGUI extends  Application {
   }
 
   public void setUpHome() {
-    VBox verticalBox = new VBox(25);
+    VBox verticalBox = new VBox(16);
     BorderPane layout = new BorderPane();
 
     Label homeLabel = new Label("Notes Manager");
@@ -80,17 +99,23 @@ public class NotesGUI extends  Application {
 
   public void setUpCreateAccount() {
 
+    Account account = new Account();
+
     BorderPane layout = new BorderPane();
-    VBox verticalLayout = new VBox(25);
+    VBox verticalLayout = new VBox(20);
 
     Label createAccountLabel = new Label("Create Account");
     createAccountLabel.setFont(Title);
 
-    TextField Username = new TextField("Create Username");
-    TextField Password = new TextField("Create Password");
+    TextField Username = new TextField();
+    Username.setPromptText("Username: ");
+    Username.setMaxWidth(250);
+
+    TextField Password = new TextField();
+    Password.setPromptText("Password: ");
+    Password.setMaxWidth(250);
 
     Button createAccountButton = new Button("Create Account");
-
 
     Alert noUserName = new Alert(Alert.AlertType.ERROR);
     noUserName.setTitle("Username Error");
@@ -103,9 +128,22 @@ public class NotesGUI extends  Application {
     verticalLayout.getChildren().addAll(createAccountLabel, Username, Password,
         createAccountButton);
     verticalLayout.setAlignment(Pos.TOP_CENTER);
-    verticalLayout.setPadding(new Insets(250,0,0,0));
+    verticalLayout.setPadding(new Insets(200,0,0,0));
+
+
+    Button backButton = new Button("Back");
+
+    backButton.setOnAction(actionEvent -> {
+      this.primaryWindow.setScene(homeScreen);
+    });
+
+    HBox horizontalLayout = new HBox();
+    horizontalLayout.getChildren().add(backButton);
+    horizontalLayout.setPadding(new Insets(10));
+    backButton.setAlignment(Pos.TOP_LEFT);
 
     layout.setCenter(verticalLayout);
+    layout.setTop(horizontalLayout);
     this.createAccount = new Scene(layout, 700, 700);
 
     createAccountButton.setOnAction(actionEvent -> {
@@ -113,6 +151,14 @@ public class NotesGUI extends  Application {
         noUserName.showAndWait();
       } else if (Password.getText().isEmpty()) {
         noPassword.showAndWait();
+      } else {
+        PasswordHashing hasher = new PasswordHashing(Username.getText(), Password.getText());
+        account.addUser(Username.getText(), hasher.getUsername());
+        try {
+          this.users = new Account().loadUsers();
+        } catch (FileNotFoundException e) {
+          throw new RuntimeException(e);
+        }
       }
 
     });
@@ -130,10 +176,10 @@ public class NotesGUI extends  Application {
 
     TextField userNameField = new TextField();
     userNameField.setMaxWidth(250);
-    userNameField.setText("Username: ");
+    userNameField.setPromptText("Username: ");
     TextField PasswordField = new TextField();
     PasswordField.setMaxWidth(250);
-    PasswordField.setText("Password: ");
+    PasswordField.setPromptText("Password: ");
 
     Button signInButton = new Button("Sign In");
 
@@ -156,14 +202,13 @@ public class NotesGUI extends  Application {
       this.primaryWindow.setScene(homeScreen);
     });
 
-    HBox horizontalBox = new HBox();
-    horizontalBox.setPadding(new Insets(10));
-
-    horizontalBox.getChildren().add(backButton);
+    HBox horizontalLayout = new HBox();
+    horizontalLayout.getChildren().add(backButton);
+    horizontalLayout.setPadding(new Insets(10));
     backButton.setAlignment(Pos.TOP_LEFT);
 
     layout.setCenter(verticalLayout);
-    layout.setTop(horizontalBox);
+    layout.setTop(horizontalLayout);
 
 
     this.signIn = new Scene(layout, 700, 700);
@@ -173,7 +218,10 @@ public class NotesGUI extends  Application {
         userNameError.showAndWait();
       } else if (PasswordField.getText().isEmpty()) {
         passwordError.showAndWait();
+      } else {
       }
+
+
 
     });
 
