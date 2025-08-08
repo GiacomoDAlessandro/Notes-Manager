@@ -20,5 +20,6 @@
         <jarDirectory url="file://$USER_HOME$/Downloads/javafx-sdk-24.0.1_2/lib" recursive="false" />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="bcprov-jdk18on-1.81 (1)" level="project" />
   </component>
 </module>
